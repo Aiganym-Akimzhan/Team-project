@@ -1,0 +1,250 @@
+var movieGrid = document.getElementById("result");
+var savedGrid = document.getElementById("favResult");
+var popup = document.getElementById("popup");
+var searchInput = document.getElementById("search");
+var savedCount = document.getElementById("count");
+var emptyMessage = document.getElementById("empty");
+
+var movies = [];
+var currentGenre = "";
+
+function posterHtml(movie) {
+  if (movie.poster) {
+    return `<img src="${movie.poster}" alt="${movie.title}"
+      style="display: block; width: 100%; height: 100%; object-fit: cover;">`;
+  }
+
+  return `<div style="width: 100%; height: 100%; display: flex; align-items: flex-end;
+      padding: 14px; box-sizing: border-box; font-family: Oswald, sans-serif;
+      font-size: 28px; text-transform: uppercase;
+      background: linear-gradient(160deg, ${movie.color}, #000);">${movie.title}</div>`;
+}
+
+function makeCard(movie) {
+  var card = document.createElement("article");
+  var heart = movie.saved ? "♥" : "♡";
+
+  card.style.animation = "fade 0.5s both";
+
+  card.onmouseenter = function () {
+    card.querySelector(".poster").style.transform = "translateY(-6px)";
+    card.querySelector(".poster").style.borderColor = "#fa003f";
+    card.querySelector(".description").style.transform = "translateY(0)";
+  };
+
+  card.onmouseleave = function () {
+    card.querySelector(".poster").style.transform = "translateY(0)";
+    card.querySelector(".poster").style.borderColor = "#262626";
+    card.querySelector(".description").style.transform = "translateY(100%)";
+  };
+
+  card.innerHTML = `
+    <div class="poster" style="position: relative; aspect-ratio: 2 / 3;
+        border: 1px solid #262626; border-radius: 12px; overflow: hidden;
+        cursor: pointer; transition: transform 0.25s, border-color 0.25s;">
+      ${posterHtml(movie)}
+      <button class="heart" type="button" style="position: absolute; top: 10px; left: 10px;
+          width: 34px; height: 34px; background: rgba(0, 0, 0, 0.7); border: 0;
+          border-radius: 50%; color: #fff; font-size: 18px; cursor: pointer;">${heart}</button>
+      <span style="position: absolute; top: 10px; right: 10px; padding: 5px 10px;
+          background: rgba(0, 0, 0, 0.7); border-radius: 20px; color: #6be08a;
+          font-size: 13px; font-weight: 600;">★ ${movie.rating}</span>
+      <div class="description" style="position: absolute; left: 0; right: 0; bottom: 0;
+          padding: 16px; background: rgba(0, 0, 0, 0.9); font-size: 14px;
+          line-height: 1.4; transform: translateY(100%);
+          transition: transform 0.3s;">${movie.description}</div>
+    </div>
+    <h3 style="margin: 14px 0 2px; font-family: Oswald, sans-serif; font-size: 21px;
+        text-transform: uppercase;">${movie.title}</h3>
+    <div style="font-family: Oswald, sans-serif; font-size: 17px;
+        text-transform: uppercase; color: #ff9500;">${movie.country}</div>
+    <div style="margin-top: 2px; font-size: 14px; color: #8c8c8c;">${movie.year}, ${movie.genre}</div>
+  `;
+
+  card.querySelector(".heart").onclick = function (event) {
+    event.stopPropagation();
+    movie.saved = !movie.saved;
+    updatePage();
+  };
+
+  card.onclick = function () {
+    openDetails(movie);
+  };
+
+  return card;
+}
+
+function showMovies(list, grid) {
+  grid.innerHTML = "";
+
+  if (list.length === 0) {
+    grid.innerHTML = "<p style='color: #8c8c8c;'>Nothing here yet.</p>";
+    return;
+  }
+
+  list.forEach(function (movie) {
+    grid.appendChild(makeCard(movie));
+  });
+}
+
+function getMovies() {
+  var text = searchInput.value.toLowerCase();
+
+  return movies.filter(function (movie) {
+    var titleMatch = movie.title.toLowerCase().includes(text);
+    var genreMatch = movie.genre.toLowerCase().includes(currentGenre);
+    return titleMatch && genreMatch;
+  });
+}
+
+function showSaved() {
+  var saved = movies.filter(function (movie) {
+    return movie.saved;
+  });
+
+  savedCount.textContent = saved.length;
+  emptyMessage.style.display = saved.length === 0 ? "block" : "none";
+
+  savedGrid.innerHTML = "";
+  saved.forEach(function (movie) {
+    savedGrid.appendChild(makeCard(movie));
+  });
+}
+
+function updatePage() {
+  showMovies(getMovies(), movieGrid);
+  showSaved();
+}
+
+function row(label, value) {
+  return `
+    <div style="display: flex; gap: 16px; margin-bottom: 14px;">
+      <b style="width: 130px; flex-shrink: 0;">${label}:</b>
+      <span style="color: #ff9500;">${value}</span>
+    </div>`;
+}
+
+function openDetails(movie) {
+  popup.innerHTML = `
+    <article class="popup-box" style="position: relative; width: 100%; max-width: 860px;
+        margin: auto; padding: 32px; box-sizing: border-box; background: #0d0d0d;
+        border: 1px solid #262626; border-radius: 16px; animation: fade 0.35s both;">
+
+      <button class="close" type="button" style="position: absolute; top: 16px; right: 16px;
+          width: 36px; height: 36px; background: #1a1a1a; border: 0;
+          border-radius: 50%; color: #fff; cursor: pointer;">✕</button>
+
+      <h2 style="margin: 0; padding-right: 48px; font-family: Oswald, sans-serif;
+          font-size: 42px; text-transform: uppercase;">${movie.title}</h2>
+
+      <p style="margin: 6px 0 28px; font-size: 16px; color: #8c8c8c;">${movie.description}</p>
+
+      <div class="popup-details" style="display: flex; flex-wrap: wrap; gap: 32px;">
+        <div style="width: 250px;">
+          <div style="padding: 6px; background: #000; border: 1px solid #262626;
+              border-radius: 6px;">${posterHtml(movie)}</div>
+        </div>
+
+        <div style="flex: 1 1 320px; line-height: 1.5;">
+          ${row("Рейтинг", "★ " + movie.rating)}
+          ${row("Страна", movie.country)}
+          ${row("Режиссёр", movie.director)}
+          ${row("Жанр", movie.genre)}
+          ${row("В ролях", movie.actors.join(", "))}
+          ${row("Дата выхода", movie.releaseDate)}
+
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px;">
+            <button class="trailer" type="button" style="padding: 14px 28px; background: #262626;
+                border: 0; border-radius: 8px; color: #fff; font-size: 15px;
+                font-weight: 600; cursor: pointer;">▶ Watch trailer</button>
+            <button class="watch" type="button" style="padding: 14px 28px; background: #fa003f;
+                border: 0; border-radius: 8px; color: #fff; font-size: 15px;
+                font-weight: 600; cursor: pointer;">▶ Watch movie</button>
+          </div>
+        </div>
+      </div>
+    </article>
+  `;
+
+  popup.style.display = "flex";
+
+  popup.querySelector(".close").onclick = closePopup;
+
+  popup.querySelector(".trailer").onclick = function () {
+    var search = movie.title + " " + movie.year + " official trailer";
+    var url =
+      "https://www.youtube.com/results?search_query=" +
+      encodeURIComponent(search);
+    window.open(url, "_blank");
+  };
+
+  popup.querySelector(".watch").onclick = function () {
+    window.location.href = "premium.html";
+  };
+}
+
+function closePopup() {
+  popup.style.display = "none";
+  popup.innerHTML = "";
+}
+
+function showSection(name) {
+  document.getElementById("home").style.display = "none";
+  document.getElementById("fav").style.display = "none";
+  document.getElementById(name).style.display = "block";
+}
+
+fetch("data.json")
+  .then(function (response) {
+    return response.json();
+  })
+  .then(function (data) {
+    movies = data.movies;
+    updatePage();
+  })
+  .catch(function () {
+    movieGrid.innerHTML =
+      "<p>Could not load films. Open index.html with Live Server.</p>";
+  });
+
+document.getElementById("searchBtn").onclick = function () {
+  showMovies(getMovies(), movieGrid);
+};
+
+searchInput.onkeyup = function (event) {
+  if (event.key === "Enter") showMovies(getMovies(), movieGrid);
+};
+
+document.getElementById("homeBtn").onclick = function () {
+  searchInput.value = "";
+  showSection("home");
+  showMovies(getMovies(), movieGrid);
+};
+
+document.getElementById("favBtn").onclick = function () {
+  showSection("fav");
+  showSaved();
+};
+
+popup.onclick = function (event) {
+  if (event.target === popup) closePopup();
+};
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") closePopup();
+});
+
+var tabs = document.querySelectorAll(".tab");
+
+tabs.forEach(function (tab) {
+  tab.onclick = function () {
+    currentGenre = tab.dataset.category;
+
+    tabs.forEach(function (other) {
+      other.classList.remove("active");
+    });
+    tab.classList.add("active");
+
+    showMovies(getMovies(), movieGrid);
+  };
+});

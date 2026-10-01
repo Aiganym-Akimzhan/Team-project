@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#050505" />
+    <title>SpiritTV — Register</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Montserrat:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @keyframes fade {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .nav-link {
+        padding: 10px 18px;
+        color: #fff;
+        font-family: Oswald, sans-serif;
+        font-size: 18px;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .nav-link:hover,
+      .nav-link.active {
+        color: #ff1a00;
+      }
+      .field {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 14px 20px;
+        background: #111;
+        border: 1px solid #262626;
+        border-radius: 40px;
+        color: #fff;
+        font-family: Montserrat, Arial, sans-serif;
+        font-size: 16px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .field:focus {
+        border-color: #ff1a00;
+      }
+      .field.invalid {
+        border-color: #ff4d4d;
+      }
+      .error {
+        min-height: 16px;
+        margin: 4px 0 0 20px;
+        color: #ff6b6b;
+        font-size: 12px;
+      }
+      .submit-btn {
+        padding: 15px;
+        background: #ff1a00;
+        border: none;
+        border-radius: 40px;
+        color: #fff;
+        font-family: Montserrat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.2s;
+      }
+      .submit-btn:hover {
+        background: #e01700;
+        transform: translateY(-2px);
+      }
+      .pass-wrap {
+        position: relative;
+      }
+      .eye-btn {
+        position: absolute;
+        top: 50%;
+        right: 14px;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #8c8c8c;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .eye-btn:hover {
+        color: #fff;
+      }
+      @media (max-width: 650px) {
+        .reg-card {
+          padding: 24px !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body
+    style="
+      margin: 0;
+      min-height: 100vh;
+      background: #050505;
+      color: #fff;
+      font-family: Montserrat, Arial, sans-serif;
+    "
+  >
+    <main
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 16px 60px;
+      "
+    >
+      <form
+        id="form"
+        novalidate
+        class="reg-card"
+        style="
+          width: 100%;
+          max-width: 420px;
+          padding: 36px;
+          box-sizing: border-box;
+          background: #0d0d0d;
+          border: 1px solid #262626;
+          border-radius: 20px;
+          animation: fade 0.5s both;
+        "
+      >
+        <h1
+          style="
+            margin: 0 0 6px;
+            font-family: Oswald, sans-serif;
+            font-size: 38px;
+            text-transform: uppercase;
+          "
+        >
+          Register
+        </h1>
+        <p style="margin: 0 0 24px; color: #8c8c8c; font-size: 14px">
+          Create an account to save your favourite movies.
+        </p>
+
+        <div style="margin-bottom: 12px">
+          <input id="name" class="field" placeholder="Full name" />
+          <p id="nameError" class="error"></p>
+        </div>
+
+        <div style="margin-bottom: 12px">
+          <input id="email" class="field" placeholder="Email" />
+          <p id="emailError" class="error"></p>
+        </div>
+
+        <div style="margin-bottom: 12px">
+          <div class="pass-wrap">
+            <input
+              id="password"
+              type="password"
+              class="field"
+              placeholder="Password (8+ characters)"
+              style="padding-right: 70px"
+            />
+            <button id="eye" type="button" class="eye-btn">SHOW</button>
+          </div>
+          <p id="passwordError" class="error"></p>
+        </div>
+
+        <div style="margin-bottom: 18px">
+          <input
+            id="confirm"
+            type="password"
+            class="field"
+            placeholder="Confirm password"
+          />
+          <p id="confirmError" class="error"></p>
+        </div>
+
+        <p
+          id="message"
+          style="margin: 0 0 14px; min-height: 20px; text-align: center"
+        ></p>
+
+        <button type="submit" class="submit-btn" style="width: 100%">
+          Create account
+        </button>
+
+        <p
+          style="
+            margin: 20px 0 0;
+            text-align: center;
+            font-size: 14px;
+            color: #8c8c8c;
+          "
+        >
+          Back to
+          <a href="index.html" style="color: #ff9500; text-decoration: none"
+            >movies</a
+          >
+        </p>
+      </form>
+    </main>
+
+    <script>
+      var form = document.getElementById("form");
+      var nameInput = document.getElementById("name");
+      var emailInput = document.getElementById("email");
+      var passwordInput = document.getElementById("password");
+      var confirmInput = document.getElementById("confirm");
+      var message = document.getElementById("message");
+      var eye = document.getElementById("eye");
+
+      function setError(input, errorId, text) {
+        document.getElementById(errorId).textContent = text;
+        if (text) {
+          input.classList.add("invalid");
+        } else {
+          input.classList.remove("invalid");
+        }
+        return text === "";
+      }
+
+      function validate() {
+        var name = nameInput.value.trim();
+        var email = emailInput.value.trim();
+        var password = passwordInput.value;
+        var confirm = confirmInput.value;
+        var ok = true;
+
+        var nameText = "";
+        if (name === "") nameText = "Please enter your name.";
+        ok = setError(nameInput, "nameError", nameText) && ok;
+
+        var emailText = "";
+        var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email))
+          emailText = "Please enter a valid email.";
+        ok = setError(emailInput, "emailError", emailText) && ok;
+
+        var passwordText = "";
+        if (password.length < 8) passwordText = "Use at least 8 characters.";
+        ok = setError(passwordInput, "passwordError", passwordText) && ok;
+
+        var confirmText = "";
+        if (confirm !== password || confirm === "")
+          confirmText = "Passwords do not match.";
+        ok = setError(confirmInput, "confirmError", confirmText) && ok;
+
+        return ok;
+      }
+
+      eye.addEventListener("click", function () {
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          eye.textContent = "HIDE";
+        } else {
+          passwordInput.type = "password";
+          eye.textContent = "SHOW";
+        }
+      });
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        message.textContent = "";
+
+        if (!validate()) return;
+
+        message.style.color = "#6be08a";
+        message.textContent = "Welcome, " + nameInput.value.trim() + "!";
+        form.reset();
+
+        setTimeout(function () {
+          window.location.href = "index.html";
+        }, 1500);
+      });
+    </script>
+  </body>
+</html>
