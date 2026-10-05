@@ -12,20 +12,27 @@
     <style>
       body {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        margin: 0;
         min-height: 100vh;
+        margin: 0;
         background: #050505;
         color: #fff;
         font-family: Montserrat, Arial, sans-serif;
       }
 
       main {
+        flex: 1;
+        width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 40px 16px 60px;
+      }
+      #navbar,
+      #footer {
+        width: 100%;
       }
       form {
         width: 100%;
@@ -109,31 +116,31 @@
   </head>
 
   <body>
+    <header id="navbar"></header>
     <main>
       <form id="form" class="reg-card">
         <h1>Register</h1>
         <p style="margin: 0 0 24px; color: #8c8c8c; font-size: 14px">
-          Create an account to save your favourite movies.
+          Create an account to enjoy the SpiritTV movie collection.
         </p>
 
         <div class="inputs">
-          <input id="name" class="nameInput" placeholder="Full name" required />
+          <input id="name" type="text" placeholder="Full name" required />
 
-          <input id="email" class="emailInput" placeholder="Email" required />
+          <input id="email" type="email" placeholder="Email" required />
 
           <input
             id="password"
             type="password"
-            class="password1"
             placeholder="Password (8+ characters)"
-            style="padding-right: 70px"
+            required
           />
 
           <input
             id="confirm"
             type="password"
-            class="password"
             placeholder="Confirm password"
+            required
           />
         </div>
 
@@ -154,12 +161,14 @@
           "
         >
           Back to
-          <a href="index.html" style="color: #ff9500; text-decoration: none"
-            >movies</a
-          >
+          <a href="/" style="color: #ff9500; text-decoration: none">movies</a>
         </p>
       </form>
     </main>
+    <footer id="footer"></footer>
+    <script src="/navbar/navbar.js"></script>
+    <script src="/shared.js"></script>
     <script src="register.js"></script>
+    <script src="/login.js"></script>
   </body>
 </html>
