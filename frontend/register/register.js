@@ -50,5 +50,8 @@ registerForm.addEventListener("submit", async (event) => {
   } catch (error) {
     message.style.color = "#ff6b6b";
     message.textContent = error.message || "Could not reach the server";
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Create account";
   }
 });
