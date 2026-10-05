@@ -1,287 +1,222 @@
 import express from "express";
-import path from "node:path";
+import cors from "cors";
 import { fileURLToPath } from "node:url";
-import { randomUUID } from "node:crypto";
-import { createPool, migrateAndSeed } from "./migrations/createTables.js";
+import { createPool } from "./migrations/createTables.js";
 
 const app = express();
+app.use(express.json());
+app.use(cors());
+const frontendPath = fileURLToPath(new URL("../frontend", import.meta.url));
+app.use(express.static(frontendPath));
+
 const pool = createPool();
 
-const frontendFolder = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../frontend",
-);
-
-app.use(express.json());
-app.use(express.static(frontendFolder));
-
-function getSessionId(req) {
-  const cookie = req.get("cookie") || "";
-
-  const session = cookie
-    .split(";")
-    .map((part) => part.trim())
-    .find((part) => part.startsWith("spirit_session="));
-
-  return session?.slice("spirit_session=".length);
+function mapMovie(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    genre: row.genre,
+    rating: row.rating,
+    poster: row.image_url,
+    description: row.description,
+    category: row.category,
+    year: row.year,
+    releaseDate: row.release_date,
+    country: row.country,
+    director: row.director,
+    actors: row.cast_names || [],
+  };
 }
 
-async function requireLogin(req, res, next) {
-  const sessionId = getSessionId(req);
-
-  if (!sessionId) {
-    return res.status(401).json({ error: "Please log in again." });
-  }
-
-  try {
-    const { rows } = await pool.query(
-      `SELECT account_id AS id, role
-       FROM sessions
-       WHERE session_id = $1 AND expires_at > NOW()`,
-      [sessionId],
-    );
-
-    const session = rows[0];
-
-    if (!session) {
-      return res.status(401).json({ error: "Please log in again." });
-    }
-
-    const table = session.role === "admin" ? "admins" : "users";
-    const account = await pool.query(`SELECT id FROM ${table} WHERE id = $1`, [
-      session.id,
-    ]);
-
-    if (!account.rowCount) {
-      await pool.query("DELETE FROM sessions WHERE session_id = $1", [
-        sessionId,
-      ]);
-      return res.status(401).json({ error: "Please log in again." });
-    }
-
-    req.session = session;
-    req.sessionId = sessionId;
-    next();
-  } catch (error) {
-    next(error);
-  }
-}
-
-function requireAdmin(req, res, next) {
-  if (req.session.role !== "admin") {
-    return res.status(403).json({
-      error: "Administrator access required.",
-    });
-  }
-
-  next();
-}
-
-async function startSession(res, account, role) {
-  const sessionId = randomUUID();
-
-  await pool.query(
-    `INSERT INTO sessions
-     (session_id, account_id, role, expires_at)
-     VALUES ($1, $2, $3, NOW() + INTERVAL '30 days')`,
-    [sessionId, account.id, role],
-  );
-
-  res.setHeader(
-    "Set-Cookie",
-    spirit_session=${sessionId}; Path=/; HttpOnly; SameSite=Strict; Max-Age=2592000,
-  );
-}
-
-// MOVIES
-
-app.get("/api/movies", async (_req, res) => {
-  try {
-    const { rows } = await pool.query(`
-      SELECT id, title, genre, rating,
-        image_url AS poster, description, category, year,
-        release_date AS "releaseDate", country, director,
-        cast_names AS actors
-      FROM movies
-      ORDER BY id
-    `);
-
-    res.json({ movies: rows });
-  } catch {
-    res.status(500).json({ error: "Could not load movies." });
-  }
+app.get("/api/users", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, username, email, created_at FROM users ORDER BY id ASC",
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: "Could not load users." });
+  }
 });
 
-app.post("/api/movies", requireLogin, requireAdmin, async (req, res) => {
-  const movie = req.body || {};
-
-  if (
-    !movie.title?.trim() ||
-    !movie.genre?.trim() ||
-    !movie.image_url?.trim()
-  ) {
-    return res.status(400).json({
-      error: "Title, genre, and image URL are required.",
-    });
-  }
-
-  try {
-    const { rows } = await pool.query(
-      `INSERT INTO movies
-       (title, genre, rating, image_url, description, category,
-        year, release_date, country, director, cast_names)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
-       RETURNING id, title, genre, rating,
-        image_url AS poster, description, category, year,
-        country, director, release_date AS "releaseDate",
-        cast_names AS actors`,
-      [
-        movie.title.trim(),
-        movie.genre.trim(),
-        Number(movie.rating) || 0,
-        movie.image_url.trim(),
-        movie.description || "",
-        movie.category || "",
-        movie.year ? Number(movie.year) : null,
-        movie.release_date || null,
-        movie.country || "",
-        movie.director || "",
-        Array.isArray(movie.cast_names) ? movie.cast_names : [],
-      ],
-    );
-app.get("/api/session", requireLogin, async (req, res) => {
-  try {
-    const table = req.session.role === "admin" ? "admins" : "users";
-
-    const { rows } = await pool.query(
-      `SELECT id, username, email
-       FROM ${table} WHERE id = $1`,
-      [req.session.id],
-    );
-
-    if (!rows.length) {
-      return res.status(401).json({
-        error: "Account was not found.",
-      });
-    }
-
-    res.json({
-      user: rows[0],
-      role: req.session.role,
-    });
-  } catch {
-    res.status(500).json({
-      error: "Could not verify session.",
-    });
-  }
+app.delete("/api/users/:id", async (req, res) => {
+  try {
+    const result = await pool.query("DELETE FROM users WHERE id = $1 RETURNING id", [
+      req.params.id,
+    ]);
+    if (!result.rowCount) return res.status(404).json({ error: "User not found." });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Could not delete user." });
+  }
 });
 
-app.delete("/api/session", async (req, res) => {
-  const sessionId = getSessionId(req);
+app.post("/api/register", async (req, res) => {
+  const username = req.body.username?.trim();
+  const email = req.body.email?.trim().toLowerCase();
+  const password = req.body.password;
+  if (!username || !email || typeof password !== "string") {
+    return res.status(400).json({ error: "Username, email, and password are required." });
+  }
 
-  if (sessionId) {
-    await pool.query("DELETE FROM sessions WHERE session_id = $1", [sessionId]);
-  }
-
-  res.setHeader(
-    "Set-Cookie",
-    "spirit_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0",
-  );
-
-  res.json({ message: "Logged out." });
+  try {
+    const result = await pool.query(
+      `INSERT INTO users (username, email, password)
+       VALUES ($1, $2, $3)
+       RETURNING id, username, email`,
+      [username, email, password],
+    );
+    res.status(201).json({ user: result.rows[0], role: "user" });
+  } catch (err) {
+    const duplicate = err.code === "23505";
+    res.status(duplicate ? 409 : 500).json({
+      error: duplicate ? "An account with this email already exists." : "Could not create your account.",
+    });
+  }
 });
 
-// ACCOUNT
+app.post("/api/login", async (req, res) => {
+  const login = req.body.username?.trim();
+  const password = req.body.password;
+  if (!login || typeof password !== "string") {
+    return res.status(400).json({ error: "Username/email and password are required." });
+  }
 
-app.patch("/api/account/username", requireLogin, async (req, res) => {
-  const username = req.body?.username?.trim();
+  try {
+    const admin = await pool.query(
+      `SELECT id, username, email FROM admins
+       WHERE (LOWER(username) = LOWER($1) OR LOWER(email) = LOWER($1))
+         AND password = $2`,
+      [login, password],
+    );
+    if (admin.rowCount) {
+      return res.json({ user: admin.rows[0], role: "admin" });
+    }
 
-  if (!username || username.length < 2) {
-    return res.status(400).json({
-      error: "Username must have at least 2 characters.",
-    });
-  }
-
-  try {
-    const table = req.session.role === "admin" ? "admins" : "users";
-
-    const { rows } = await pool.query(
-      `UPDATE ${table}
-       SET username = $1
-       WHERE id = $2
-       RETURNING id, username, email`,
-      [username, req.session.id],
-    );
-
-    if (!rows.length) {
-      return res.status(404).json({
-        error: "Account was not found.",
-      });
-    }
-
-    res.json({ user: rows[0] });
-  } catch {
-    res.status(500).json({
-      error: "Could not update username.",
-    });
-  }
+    const user = await pool.query(
+      `SELECT id, username, email FROM users
+       WHERE (LOWER(username) = LOWER($1) OR LOWER(email) = LOWER($1))
+         AND password = $2`,
+      [login, password],
+    );
+    if (!user.rowCount) return res.status(401).json({ error: "Invalid username/email or password." });
+    res.json({ user: user.rows[0], role: "user" });
+  } catch (err) {
+    res.status(500).json({ error: "Could not log in." });
+  }
 });
 
-// USERS
+app.patch("/api/account/username", async (req, res) => {
+  const username = req.body.username?.trim();
+  const userId = Number(req.body.userId);
+  const role = req.body.role;
+  if (!username || username.length < 2 || !Number.isInteger(userId)) {
+    return res.status(400).json({ error: "Enter a username with at least 2 characters." });
+  }
+  if (role !== "admin" && role !== "user") {
+    return res.status(400).json({ error: "Invalid account role." });
+  }
 
-app.get("/api/users", requireLogin, requireAdmin, async (_req, res) => {
-  try {
-    const { rows } = await pool.query(
-      `SELECT id, username, email, created_at
-       FROM users ORDER BY id`,
-    );
-
-    res.json(rows);
-  } catch {
-    res.status(500).json({
-      error: "Could not load users.",
-    });
-  }
+  try {
+    const table = role === "admin" ? "admins" : "users";
+    const result = await pool.query(
+      `UPDATE ${table} SET username = $1 WHERE id = $2
+       RETURNING id, username, email`,
+      [username, userId],
+    );
+    if (!result.rowCount) return res.status(404).json({ error: "Account not found." });
+    res.json({ user: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: "Could not update username." });
+  }
 });
 
-app.delete("/api/users/:id", requireLogin, requireAdmin, async (req, res) => {
-  try {
-    const result = await pool.query(
-      "DELETE FROM users WHERE id = $1 RETURNING id",
-      [req.params.id],
-    );
-
-    if (!result.rowCount) {
-      return res.status(404).json({
-        error: "User was not found.",
-      });
-    }
-
-    res.json({ message: "User deleted." });
-  } catch {
-    res.status(500).json({
-      error: "Could not delete user.",
-    });
-  }
+app.get("/api/movies", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM movies ORDER BY id ASC");
+    res.json({ movies: result.rows.map(mapMovie) });
+  } catch (err) {
+    res.status(500).json({ error: "Could not load movies." });
+  }
 });
 
-// FRONTEND
+app.post("/api/movies", async (req, res) => {
+  const movie = req.body;
+  if (!movie.title?.trim()) {
+    return res.status(400).json({ error: "Movie title is required." });
+  }
 
-app.get("/", (_req, res) => {
-  res.sendFile(path.join(frontendFolder, "index.html"));
+  try {
+    const result = await pool.query(
+      `INSERT INTO movies
+        (title, genre, rating, image_url, description, category, year,
+         release_date, country, director, cast_names)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+       RETURNING *`,
+      [
+        movie.title.trim(), movie.genre || "", Number(movie.rating) || 0,
+        movie.poster || movie.image_url || "", movie.description || "", movie.category || "",
+        Number(movie.year) || null, movie.releaseDate || movie.release_date || null,
+        movie.country || "", movie.director || "", movie.cast_names || [],
+      ],
+    );
+    res.status(201).json({ movie: mapMovie(result.rows[0]) });
+  } catch (err) {
+    const duplicate = err.code === "23505";
+    res.status(duplicate ? 409 : 500).json({
+      error: duplicate ? "A movie with this title already exists." : "Could not add movie.",
+    });
+  }
 });
 
-const port = Number(process.env.PORT || 3000);
+app.delete("/api/movies/:id", async (req, res) => {
+  try {
+    const result = await pool.query("DELETE FROM movies WHERE id = $1 RETURNING id", [
+      req.params.id,
+    ]);
+    if (!result.rowCount) return res.status(404).json({ error: "Movie not found." });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Could not delete movie." });
+  }
+});
 
-try {
-  await migrateAndSeed(pool);
+app.get("/api/actors", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM actors ORDER BY id ASC");
+    res.json(result.rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      role: row.role,
+      photo: row.image_url,
+    })));
+  } catch (err) {
+    res.status(500).json({ error: "Could not load actors." });
+  }
+});
 
-  app.listen(port, () => {
-    console.log(`SpiritTV ready at http://localhost:${port}`);
-  });
-} catch (error) {
-  console.error("Could not start the app:", error);
+app.post("/api/actors", async (req, res) => {
+  const { name, role } = req.body;
+  const photo = req.body.photo || req.body.image_url;
+  if (!name?.trim()) return res.status(400).json({ error: "Actor name is required." });
 
-  await pool.end();
-  process.exit(1);
-}
+  try {
+    const result = await pool.query(
+      `INSERT INTO actors (name, role, image_url)
+       VALUES ($1, $2, $3) RETURNING *`,
+      [name.trim(), role || "", photo || ""],
+    );
+    const row = result.rows[0];
+    res.status(201).json({ actor: { id: row.id, name: row.name, role: row.role, photo: row.image_url } });
+  } catch (err) {
+    const duplicate = err.code === "23505";
+    res.status(duplicate ? 409 : 500).json({
+      error: duplicate ? "This actor already exists." : "Could not add actor.",
+    });
+  }
+});
+
+const port = Number(process.env.PORT) || 3000;
+app.listen(port, () => {
+  console.log(`Server listening on http://localhost:${port}`);
+});
