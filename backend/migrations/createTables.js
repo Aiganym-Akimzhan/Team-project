@@ -58,12 +58,6 @@ async function createTables(client) {
       cast_names TEXT[] DEFAULT '{}'
     );
 
-    CREATE TABLE IF NOT EXISTS sessions (
-      session_id TEXT PRIMARY KEY,
-      account_id INTEGER NOT NULL,
-      role VARCHAR(10) NOT NULL CHECK (role IN ('admin', 'user')),
-      expires_at TIMESTAMP NOT NULL
-    );
   `);
 }
 
