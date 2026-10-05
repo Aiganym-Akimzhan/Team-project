@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#050505" />
+    <title>SpiritTV — About Us</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Montserrat:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #050505;
+        color: #fff;
+        font-family: Montserrat, Arial, sans-serif;
+      }
+      main {
+        width: min(1200px, 100%);
+        min-height: 70vh;
+        margin: auto;
+        padding: 72px 24px;
+      }
+      .intro {
+        max-width: 760px;
+        margin: 0 auto 48px;
+        text-align: center;
+      }
+      .intro p {
+        color: #bdbdbd;
+        line-height: 1.8;
+      }
+      h1,
+      h2 {
+        font-family: Oswald, sans-serif;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(42px, 8vw, 72px);
+      }
+      h1 span {
+        color: #fa003f;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+      }
+      .card {
+        padding: 26px;
+        border: 1px solid #292929;
+        border-radius: 16px;
+        background: #0d0d0d;
+      }
+      .number {
+        color: #fa003f;
+        font:
+          700 30px Oswald,
+          sans-serif;
+      }
+      .card p {
+        margin-bottom: 0;
+        color: #aaa;
+        line-height: 1.7;
+      }
+      .popular {
+        margin-top: 72px;
+      }
+      .popular-heading {
+        margin-bottom: 18px;
+      }
+      .popular-heading h2 {
+        margin: 0;
+        font-size: 36px;
+      }
+      .movie-track {
+        display: flex;
+        gap: 18px;
+        overflow-x: auto;
+        padding: 4px 2px 18px;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+      }
+      .movie-track::-webkit-scrollbar {
+        display: none;
+      }
+      .popular-movie {
+        flex: 0 0 180px;
+        scroll-snap-align: start;
+      }
+      .popular-movie img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 2 / 3;
+        border: 1px solid #292929;
+        border-radius: 12px;
+        background: #111;
+        object-fit: cover;
+      }
+      .popular-movie h3 {
+        margin: 10px 2px 0;
+        font:
+          500 17px Oswald,
+          sans-serif;
+      }
+      #popularMessage {
+        color: #999;
+      }
+      .browse {
+        display: inline-block;
+        margin-top: 34px;
+        padding: 13px 24px;
+        border-radius: 30px;
+        background: #fa003f;
+        color: white;
+        text-decoration: none;
+      }
+      #navbar,
+      #footer {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <section
+      style="position: sticky; top: 0; z-index: 5"
+      name="navbar"
+    ></section>
+    <main>
+      <section class="intro">
+        <p
+          style="color: #fa003f; letter-spacing: 3px; text-transform: uppercase"
+        >
+          Stories worth staying up for
+        </p>
+        <h1>About <span>SpiritTV</span></h1>
+        <p>
+          SpiritTV is a place for people who love movies. We bring films,
+          genres, and the actors behind them together so it is easy to find
+          something new to watch.
+        </p>
+        <a class="browse" href="/index.html">Explore movies</a>
+      </section>
+      <section class="cards">
+        <article class="card">
+          <div class="number">01</div>
+          <h2>Discover</h2>
+          <p>Browse films across different genres and find your next story.</p>
+        </article>
+        <article class="card">
+          <div class="number">02</div>
+          <h2>Explore</h2>
+          <p>
+            Learn about movie details, directors, and the actors in the cast.
+          </p>
+        </article>
+        <article class="card">
+          <div class="number">03</div>
+          <h2>Enjoy</h2>
+          <p>
+            Choose a movie, watch its trailer, and see our subscription options.
+          </p>
+        </article>
+      </section>
+      <section class="popular">
+        <h2 id="popularTitle">Popular Movies</h2>
+        <p id="popularMessage">Loading movies…</p>
+        <div id="popularMovies" class="movie-track"></div>
+      </section>
+      <div id="contact" style="margin-top: 80px; text-align: center">
+        <h2 style="font-size: 48px; color: #fa003f; margin-bottom: 16px">
+          CONTACT US
+        </h2>
+        <p
+          style="
+            max-width: 600px;
+            margin: 0 auto 40px;
+            color: #bdbdbd;
+            font-size: 16px;
+            font-weight: 400;
+          "
+        >
+          Have questions, feedback, or business inquiries? <br />Get in touch
+          with our team directly.
+        </p>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+          "
+        >
+          <div
+            style="
+              width: 250px;
+              padding: 30px 20px;
+              border: 1px solid #252525;
+              border-radius: 30px;
+              background: #0b0b0b;
+              text-align: center;
+            "
+          >
+            <h3 style="margin: 0 0 8px; font-size: 20px">Phone</h3>
+            <a
+              href="tel:+77027158302"
+              style="
+                color: #999;
+                text-decoration: none;
+                font-size: 15px;
+                font-weight: 400;
+                transition: color 0.3s;
+                :hover {
+                  color: #fa003f;
+                }
+              "
+            >
+              +7 702 715 8302
+            </a>
+            <br />
+          </div>
+
+          <div
+            style="
+              width: 250px;
+              padding: 30px 20px;
+              border: 1px solid #252525;
+              border-radius: 30px;
+              background: #0b0b0b;
+              text-align: center;
+            "
+          >
+            <h3 style="margin: 0 0 8px; font-size: 20px">Email</h3>
+            <a
+              href="spirittv44@gmail.com"
+              style="
+                color: #999;
+                text-decoration: none;
+                font-size: 15px;
+                font-weight: 400;
+                transition: color 0.3s;
+              "
+            >
+              spirittv44@gmail.com
+            </a>
+          </div>
+
+          <div
+            style="
+              width: 250px;
+              padding: 30px 20px;
+              border: 1px solid #252525;
+              border-radius: 30px;
+              background: #0b0b0b;
+              text-align: center;
+            "
+          >
+            <h3 style="margin: 0 0 8px; font-size: 20px">Support Hours</h3>
+            <p
+              style="margin: 0; color: #999; font-size: 15px; font-weight: 400"
+            >
+              24/7 Customer Support
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <section name="footer"></section>
+
+    <script src="/navbar/navbar.js"></script>
+    <script src="/shared.js"></script>
+    <script src="/login.js"></script>
+    <script src="/about/about.js"></script>
+  </body>
+</html>
