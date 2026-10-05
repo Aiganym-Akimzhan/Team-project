@@ -9,14 +9,6 @@
       rel="stylesheet"
     />
     <style>
-      a,
-      a:visited {
-        color: #fff;
-        text-decoration: none;
-      }
-      a:hover {
-        color: #fa003f;
-      }
       body {
         background: black;
       }
@@ -32,12 +24,12 @@
         }
       }
 
-      section {
+      .plans {
         transition: transform 0.3s;
         animation: fade 1s;
       }
 
-      section:hover {
+      .plans:hover {
         transform: translateY(-10px);
       }
 
@@ -115,7 +107,10 @@
       font-family: Montserrat, Arial, sans-serif;
     "
   >
-    <header id="navbar"></header>
+    <section
+      style="position: sticky; top: 0; z-index: 5"
+      name="navbar"
+    ></section>
 
     <div
       style="
@@ -281,7 +276,8 @@
         <img src="../icons/qrcode.jpeg" />
       </section>
     </div>
-    <footer id="footer"></footer>
+    <section name="footer"></section>
+
     <script src="/navbar/navbar.js"></script>
     <script src="/shared.js"></script>
     <script src="/subscription/index.js"></script>
