@@ -10,17 +10,6 @@
       rel="stylesheet"
     />
     <style>
-      @keyframes fade {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: none;
-        }
-      }
-
       header {
         position: sticky;
         top: 0;
@@ -43,19 +32,7 @@
         background: #fa003f;
         border-color: #fa003f;
       }
-      nav {
-        font-family: Oswald, sans-serif;
-      }
-      nav button,
-      nav a {
-        color: #fff;
-      }
 
-      nav button:hover,
-      nav a:hover {
-        color: #ff1a00;
-        transition: 0.3s;
-      }
       #adminMovieForm input,
       #adminMovieForm textarea {
         min-width: 0;
@@ -64,8 +41,6 @@
         border-radius: 9px;
         background: #111;
         color: #fff;
-        font: inherit;
-        color-scheme: dark;
       }
 
       .actors-wrap {
@@ -81,18 +56,9 @@
       .actors-track {
         display: flex;
         gap: 25px;
-
-       
-        justify-content: flex-start;
-
-       
         overflow-x: auto;
-        overflow-y: hidden;
-
         padding: 20px 4px 20px;
-
         scroll-behavior: smooth;
-        scrollbar-width: none;
       }
 
       .actors-track::-webkit-scrollbar {
@@ -100,12 +66,9 @@
       }
 
       .actor {
-        flex: 0 0 140px;
-        width: 140px;
-
         text-align: center;
 
-        transition: transform 0.4s;
+        transition: 0.4s;
       }
 
       .actor:hover {
@@ -123,7 +86,6 @@
         justify-content: center;
 
         overflow: hidden;
-
         background: linear-gradient(160deg, #fa003f, #000);
 
         border: 2px solid #262626;
@@ -179,8 +141,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-
-        transition: 0.2s;
       }
 
       .actors-arrow:hover {
@@ -195,6 +155,195 @@
       .actors-right {
         right: -20px;
       }
+
+      .movie-card {
+        min-width: 0;
+        animation: fade 0.5s both;
+      }
+
+      @keyframes fade {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .poster {
+        position: relative;
+        aspect-ratio: 2 / 3;
+        overflow: hidden;
+        border: 1px solid #262626;
+        border-radius: 12px;
+        cursor: pointer;
+        transition:
+          transform 0.25s,
+          border-color 0.25s;
+      }
+      .movie-card:hover .poster {
+        transform: translateY(-6px);
+        border-color: #fa003f;
+      }
+      .poster-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .poster-placeholder {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: flex-end;
+        padding: 14px;
+        font:
+          28px Oswald,
+          sans-serif;
+        text-transform: uppercase;
+      }
+      .rating {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        background: #000b;
+        color: #6be08a;
+        font-size: 13px;
+      }
+      .description {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        padding: 16px;
+        background: #000e;
+        font-size: 14px;
+        line-height: 1.4;
+        transform: translateY(101%);
+        transition: transform 0.3s;
+      }
+      .movie-card:hover .description {
+        transform: translateY(0);
+      }
+      .movie-card h3 {
+        margin: 14px 0 2px;
+        font:
+          21px Oswald,
+          sans-serif;
+        text-transform: uppercase;
+      }
+      .movie-country {
+        color: #ff9500;
+        font:
+          17px Oswald,
+          sans-serif;
+        text-transform: uppercase;
+      }
+      .movie-year {
+        margin-top: 2px;
+        color: #8c8c8c;
+        font-size: 14px;
+      }
+      .empty-message {
+        color: #8c8c8c;
+      }
+      .popup-box {
+        position: relative;
+        width: 100%;
+        max-width: 860px;
+        margin: auto;
+        padding: 32px;
+        box-sizing: border-box;
+        border: 1px solid #262626;
+        border-radius: 16px;
+        background: #0d0d0d;
+        animation: fade 0.35s both;
+      }
+      .popup-box h2 {
+        margin: 0;
+        padding-right: 48px;
+        font:
+          42px Oswald,
+          sans-serif;
+        text-transform: uppercase;
+      }
+      .popup-box .close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+        border: 0;
+        border-radius: 50%;
+        background: #1a1a1a;
+        color: #fff;
+        cursor: pointer;
+      }
+      .close:hover {
+        background-color: #fa003f;
+        transition: 0.4s;
+      }
+      .popup-description {
+        margin: 6px 0 28px;
+        color: #8c8c8c;
+      }
+      .popup-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 32px;
+      }
+      .popup-poster {
+        width: 250px;
+        padding: 6px;
+        border: 1px solid #262626;
+        border-radius: 6px;
+        background: #000;
+      }
+      .popup-poster .poster-image,
+      .popup-poster .poster-placeholder {
+        height: auto;
+        width: 100%;
+        height: 300px;
+      }
+      .movie-facts {
+        flex: 1 1 320px;
+        line-height: 1.5;
+      }
+      .detail-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+      .detail-row b {
+        width: 130px;
+      }
+      .detail-row span {
+        color: #ff9500;
+      }
+      .popup-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+      }
+      .popup-actions button {
+        padding: 14px 20px;
+        border: 0;
+        border-radius: 8px;
+        background: #262626;
+        color: #fff;
+        font-weight: 600;
+      }
+      .popup-actions .watch {
+        background: #fa003f;
+      }
+      .popup-actions .delete-movie {
+        background: #7a1025;
+      }
     </style>
   </head>
 
@@ -208,9 +357,10 @@
       font-weight: 700;
     "
   >
-    <header id="navbar"></header>
-
-    <!-- Menu -->
+    <section
+      style="position: sticky; top: 0; z-index: 5"
+      name="navbar"
+    ></section>
 
     <section
       id="top"
@@ -238,7 +388,6 @@
           background:
             linear-gradient(90deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.1)),
             linear-gradient(0deg, rgba(0, 0, 0, 0.75), transparent 65%);
-          pointer-events: none;
         "
       >
         <div
@@ -262,7 +411,7 @@
               max-width: 650px;
               margin: 0;
               font-family: Oswald, sans-serif;
-              font-size: clamp(38px, 7vw, 72px);
+              font-size: 70px;
               line-height: 1.05;
               text-transform: uppercase;
             "
@@ -324,7 +473,6 @@
                 border-radius: 40px;
                 color: #fff;
                 font-size: 16px;
-                outline: none;
               "
             />
             <button
@@ -337,7 +485,6 @@
                 color: #fff;
                 font-size: 16px;
                 font-weight: 600;
-                cursor: pointer;
               "
             >
               Search
@@ -345,23 +492,89 @@
           </div>
           <div
             id="adminMoviePanel"
-            style="display:none; margin: 24px 0; padding: 24px; background:#0d0d0d; border:1px solid #333; border-radius:16px;"
+            style="
+              display: none;
+              margin: 24px 0;
+              padding: 24px;
+              background: #0d0d0d;
+              border: 1px solid #333;
+              border-radius: 16px;
+            "
           >
-            <h2 style="margin-top:0; font-family:Oswald,sans-serif;">ADD MOVIE</h2>
-            <form id="adminMovieForm" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px;">
+            <h2 style="margin-top: 0; font-family: Oswald, sans-serif">
+              ADD MOVIE
+            </h2>
+            <form
+              id="adminMovieForm"
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+                gap: 12px;
+              "
+            >
               <input name="title" placeholder="Title" required />
-              <input name="image_url" type="url" placeholder="Image URL" required />
+              <input
+                name="image_url"
+                type="url"
+                placeholder="Image URL"
+                required
+              />
               <input name="genre" placeholder="Genre" required />
-              <input name="rating" type="number" min="0" max="10" step="0.1" placeholder="Rating" />
+              <input name="rating" type="number" placeholder="Rating" />
               <input name="category" placeholder="Category" />
-              <input name="year" type="number" min="1888" max="2100" placeholder="Year" />
-              <input name="release_date" type="date" aria-label="Release date" />
+              <input name="year" type="number" placeholder="Year" />
+              <input name="release_date" type="date" />
               <input name="country" placeholder="Country" />
               <input name="director" placeholder="Director" />
-              <input name="cast_names" placeholder="Cast (comma-separated)" />
-              <textarea name="description" placeholder="Description" style="grid-column:1/-1; min-height:80px;"></textarea>
-              <button type="submit" style="padding:12px 20px; background:#fa003f; border:0; border-radius:30px; color:white; cursor:pointer;">Add movie</button>
-              <p id="adminMovieMessage" role="status" style="grid-column:1/-1; margin:0;"></p>
+              <input name="cast_names" placeholder="Cast " />
+              <textarea
+                name="description"
+                placeholder="Description"
+                style="min-height: 80px"
+              ></textarea>
+              <button
+                type="submit"
+                style="
+                  padding: 12px 20px;
+                  background: #fa003f;
+                  border: 0;
+                  border-radius: 30px;
+                  color: white;
+                  cursor: pointer;
+                "
+              >
+                Add movie
+              </button>
+              <p id="adminMovieMessage" style="margin: 0"></p>
+            </form>
+            <h2 style="font-family: Oswald, sans-serif; margin-bottom: 10px">
+              ADD ACTOR
+            </h2>
+            <form
+              id="adminActorForm"
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+                gap: 12px;
+              "
+            >
+              <input name="name" placeholder="Actor name" required />
+              <input name="role" placeholder="Local name" />
+              <input name="image_url" type="url" placeholder="Photo URL" />
+              <button
+                type="submit"
+                style="
+                  padding: 12px 20px;
+                  background: #fa003f;
+                  border: 0;
+                  border-radius: 30px;
+                  color: white;
+                  cursor: pointer;
+                "
+              >
+                Add actor
+              </button>
+              <p id="adminActorMessage" style="margin: 0"></p>
             </form>
           </div>
           <div
@@ -376,32 +589,6 @@
         </div>
       </section>
 
-      
-      <section id="fav" style="display: none; padding-top: 20px">
-        <h2
-          style="
-            margin: 0 0 24px;
-            font-family: Oswald, sans-serif;
-            font-size: 44px;
-            text-transform: uppercase;
-          "
-        >
-          Favourites
-        </h2>
-        <p id="empty" style="color: #8c8c8c">
-          Nothing here yet. Tap the heart on any movie.
-        </p>
-        <div
-          id="favResult"
-          class="movie-grid"
-          style="
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-            gap: 24px;
-          "
-        ></div>
-      </section>
-
       <div class="actors-wrap">
         <button id="actorsLeft" class="actors-arrow actors-left">←</button>
 
@@ -411,7 +598,7 @@
       </div>
 
       <section id="about" style="margin-top: 90px; text-align: center">
-        <h2 style="font-size: 48px; color: #fa003f">ABOUT US</h2>
+        <h2 style="font-size: 40px; color: #fa003f">JOIN TO US</h2>
 
         <p
           style="
@@ -423,8 +610,8 @@
           "
         >
           SpiritTV is a place for people who love movies. Discover new stories,
-          explore different genres, find your favorite actors, and keep all the
-          movies you love in one place.
+          explore different genres, and learn about the actors who bring each
+          story to life.
         </p>
 
         <div
@@ -517,136 +704,13 @@
                 font-weight: 400;
               "
             >
-              Create your own collection and keep your favorite movies close.
+              Find films and explore more stories whenever you visit.
             </p>
           </div>
         </div>
       </section>
     </main>
-   
 
-    <div
-      id="loginBox"
-      style="
-        display: none;
-        position: fixed;
-        inset: 0;
-        z-index: 20;
-        padding: 16px;
-        box-sizing: border-box;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0, 0, 0, 0.88);
-      "
-    >
-      <form
-        id="loginForm"
-        style="
-          position: relative;
-          width: 100%;
-          max-width: 380px;
-          padding: 32px;
-          box-sizing: border-box;
-          display: grid;
-          gap: 14px;
-          background: #0d0d0d;
-          border: 1px solid #262626;
-          border-radius: 20px;
-          animation: fade 1s;
-        "
-      >
-        <button
-          id="loginClose"
-          type="button"
-          aria-label="Close"
-          style="
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 36px;
-            height: 36px;
-            background: #1a1a1a;
-            border: 0;
-            border-radius: 50%;
-            color: #fff;
-            cursor: pointer;
-          "
-        >
-          ✕
-        </button>
-        <h2
-          style="
-            margin: 0 0 6px;
-            font-family: Oswald, sans-serif;
-            font-size: 34px;
-            text-transform: uppercase;
-          "
-        >
-          Login
-        </h2>
-        <input
-          id="loginName"
-          placeholder="Username"
-          style="
-            padding: 14px 20px;
-            background: #111;
-            border: 1px solid #262626;
-            border-radius: 40px;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-          "
-        />
-        <input
-          id="loginPassword"
-          type="password"
-          placeholder="Password"
-          style="
-            padding: 14px 20px;
-            background: #111;
-            border: 1px solid #262626;
-            border-radius: 40px;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-          "
-        />
-        <p
-          id="loginMessage"
-          style="margin: 0; min-height: 20px; font-size: 14px"
-        ></p>
-        <button
-          type="submit"
-          style="
-            padding: 15px;
-            background: #fa003f;
-            border: none;
-            border-radius: 40px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-          "
-        >
-          Login
-        </button>
-      </form>
-    </div>
-
-    <div id="profileBox" style="display:none; position:fixed; inset:0; z-index:30; align-items:center; justify-content:center; padding:16px; background:#000d;">
-      <form id="profileForm" style="position:relative; width:min(420px,100%); display:grid; gap:14px; padding:30px; background:#0d0d0d; border:1px solid #333; border-radius:18px;">
-        <button id="profileClose" type="button" aria-label="Close" style="position:absolute; top:10px; right:12px; background:none; border:0; color:white; font-size:24px; cursor:pointer;">×</button>
-        <h2 style="margin:0; font-family:Oswald,sans-serif;">YOUR ACCOUNT</h2>
-        <p id="profileEmail" style="margin:0; color:#aaa;"></p>
-        <label for="profileUsername">Username</label>
-        <input id="profileUsername" required minlength="2" />
-        <p id="profileMessage" role="status" style="margin:0; min-height:20px;"></p>
-        <button type="submit" style="padding:12px; background:#fa003f; border:0; border-radius:30px; color:white; cursor:pointer;">Save username</button>
-        <button id="logoutBtn" type="button" style="padding:12px; background:#222; border:1px solid #444; border-radius:30px; color:white; cursor:pointer;">Log out</button>
-      </form>
-    </div>
-
-    
     <div
       id="popup"
       style="
@@ -655,14 +719,15 @@
         inset: 0;
         z-index: 10;
         padding: 16px;
-        box-sizing: border-box;
         overflow-y: auto;
         background: rgba(0, 0, 0, 0.88);
         justify-content: center;
       "
     ></div>
 
-    <footer id="footer"></footer>
+    <section name="footer"></section>
+    <script src="/navbar/navbar.js"></script>
+    <script src="/shared.js"></script>
     <script src="index.js"></script>
     <script src="login.js"></script>
   </body>
