@@ -1,6 +1,6 @@
 const popularMovies = document.getElementById("popularMovies");
 const popularMessage = document.getElementById("popularMessage");
-
+b
 async function showPopularMovies() {
   try {
     const response = await fetch("/api/movies");
