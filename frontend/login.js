@@ -1,5 +1,18 @@
 let currentUser = null;
 let currentRole = null;
+const AUTH_STORAGE_KEY = "spirittv.auth";
+
+function persistLogin() {
+  if (!currentUser || !currentRole) {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    return;
+  }
+
+  localStorage.setItem(
+    AUTH_STORAGE_KEY,
+    JSON.stringify({ user: currentUser, role: currentRole }),
+  );
+}
 
 function updateNavigation() {
   const loginButton = document.getElementById("loginBtn");
@@ -95,6 +108,7 @@ async function connectLogin() {
 
       currentUser = result.user;
       currentRole = result.role;
+      persistLogin();
 
       if (currentRole === "admin") {
         window.alert("Welcome admin!");
@@ -144,16 +158,20 @@ async function saveUsername(event) {
       },
       body: JSON.stringify({
         username: username,
+        userId: currentUser.id,
+        role: currentRole,
       }),
     });
 
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.error || "Could not update username.");
+      console.error("Could not load movies.");
+      return;
     }
 
     currentUser = result.user;
+    persistLogin();
 
     document.getElementById("profileMessage").textContent = "Username updated.";
 
@@ -165,25 +183,26 @@ async function saveUsername(event) {
 
 async function restoreLogin() {
   try {
-    const response = await fetch("/api/session");
+    const saved = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!saved) return;
 
-    if (!response.ok) return;
-
-    const result = await response.json();
+    const result = JSON.parse(saved);
+    if (!result.user || !["admin", "user"].includes(result.role)) {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      return;
+    }
 
     currentUser = result.user;
     currentRole = result.role;
   } catch {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
     currentUser = null;
     currentRole = null;
   }
 }
 
 async function logOut() {
-  await fetch("/api/session", {
-    method: "DELETE",
-  });
-
+  localStorage.removeItem(AUTH_STORAGE_KEY);
   currentUser = null;
   currentRole = null;
 
